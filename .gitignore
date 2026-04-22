@@ -3,6 +3,8 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 .kotlin
+*bak*
+*lck*
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
