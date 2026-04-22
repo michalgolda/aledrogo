@@ -1,7 +1,7 @@
 package org.aledrogo.entity;
 
-public class Moderator extends User{
-    public Moderator(String email, String password) {
-        super(email, password);
+public class Moderator extends Buyer {
+    public Moderator(String email, String password, String firstName, String lastName) {
+        super(email, password, SystemRole.MODERATOR);
     }
 }

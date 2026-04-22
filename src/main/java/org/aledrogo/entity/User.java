@@ -1,27 +1,35 @@
 package org.aledrogo.entity;
 
-public class User {
+
+
+public abstract class User {
     private String email;
     private String password;
+    private final SystemRole role;
 
-    public User(String email, String password) {
+    public User(String email, String password, SystemRole role) {
         this.email = email;
         this.password = password;
+        this.role = role;
     }
 
-    String getEmail() {
+    public String getEmail() {
         return email;
     }
 
-    void setEmail(String email) {
+    public void setEmail(String email) {
         this.email = email;
     }
 
-    String getPassword() {
+    public String getPassword() {
         return password;
     }
 
-    void setPassword(String password) {
+    public void setPassword(String password) {
         this.password = password;
+    }
+
+    public SystemRole getRole() {
+        return this.role;
     }
 }
