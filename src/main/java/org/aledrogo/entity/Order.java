@@ -1,12 +1,12 @@
 package org.aledrogo.entity;
 
 public class Order {
-    public int quantity;
-    public final Offer offer;
-    public final Buyer buyer;
-    public final PaymentMethod paymentMethod;
-    public final OrderShippingDetails shippingDetails;
-    public OrderStatus status = OrderStatus.PENDING;
+    private int quantity;
+    private final Offer offer;
+    private final Buyer buyer;
+    private final PaymentMethod paymentMethod;
+    private final OrderShippingDetails shippingDetails;
+    private OrderStatus status = OrderStatus.PENDING;
 
     public Order(int quantity, Offer offer, Buyer buyer, PaymentMethod paymentMethod, OrderShippingDetails shippingDetails) {
         this.offer = offer;

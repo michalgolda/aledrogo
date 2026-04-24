@@ -1,12 +1,12 @@
 package org.aledrogo.entity;
 
 public class OrderShippingDetails {
-    public String country;
-    public String address;
-    public String city;
-    public String postalCode;
-    public String phoneNumber;
-    public String voivodeship;
+    private String country;
+    private String address;
+    private String city;
+    private String postalCode;
+    private String phoneNumber;
+    private String voivodeship;
 
     public OrderShippingDetails(String country, String address, String city, String postalCode, String phoneNumber, String voivodeship) {
         this.country = country;

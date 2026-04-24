@@ -4,11 +4,11 @@ package org.aledrogo.entity;
 import java.math.BigDecimal;
 
 public class Offer {
-    public String name;
-    public String description;
-    public BigDecimal price;
-    public int quantity;
-    public final Seller seller;
+    private String name;
+    private String description;
+    private BigDecimal price;
+    private int quantity;
+    private final Seller seller;
 
     public Offer(String name, String description, BigDecimal price, int quantity, Seller seller) {
         this.name = name;
