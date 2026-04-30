@@ -6,11 +6,11 @@ import java.math.BigDecimal;
 public class Offer {
     private String name;
     private String description;
-    private BigDecimal price;
+    private Double price;
     private int quantity;
     private final Seller seller;
 
-    public Offer(String name, String description, BigDecimal price, int quantity, Seller seller) {
+    public Offer(String name, String description, double price, int quantity, Seller seller) {
         this.name = name;
         this.description = description;
         this.price = price;
@@ -34,11 +34,11 @@ public class Offer {
         this.description = description;
     }
 
-    public BigDecimal getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
