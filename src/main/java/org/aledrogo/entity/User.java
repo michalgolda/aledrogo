@@ -2,7 +2,7 @@ package org.aledrogo.entity;
 
 
 
-public abstract class User {
+public abstract class User extends Entity {
     private String email;
     private String password;
     private final SystemRole role;

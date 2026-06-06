@@ -1,6 +1,6 @@
 package org.aledrogo.entity;
 
-public class Order {
+public class Order extends Entity {
     private int quantity;
     private final Offer offer;
     private final Buyer buyer;

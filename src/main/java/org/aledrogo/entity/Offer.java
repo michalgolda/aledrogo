@@ -1,9 +1,8 @@
 package org.aledrogo.entity;
 
 
-import java.math.BigDecimal;
 
-public class Offer {
+public class Offer extends Entity {
     private String name;
     private String description;
     private Double price;

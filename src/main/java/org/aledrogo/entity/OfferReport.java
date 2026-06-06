@@ -1,6 +1,6 @@
 package org.aledrogo.entity;
 
-public class OfferReport {
+public class OfferReport extends Entity {
     private String reason;
     private final Offer offer;
     private OfferReportStatus status;
