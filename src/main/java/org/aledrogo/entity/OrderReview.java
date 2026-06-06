@@ -1,20 +1,20 @@
 package org.aledrogo.entity;
 
-public class OfferReview {
-    private final Offer offer;
+public class OrderReview extends Entity {
+    private final Order order;
     private final Buyer reviewer;
     private float rating;
     private String description;
 
-    public OfferReview(Offer offer, Buyer reviewer, float rating) {
-        this.offer = offer;
+    public OrderReview(Order order, Buyer reviewer, float rating) {
+        this.order = order;
         this.reviewer = reviewer;
         this.rating = rating;
         this.description = null;
     }
 
-    public Offer getOffer() {
-        return offer;
+    public Order getOffer() {
+        return order;
     }
 
     public Buyer getReviewer() {
