@@ -30,6 +30,11 @@ public class MemoryUserRepository extends UserRepository {
     }
 
     @Override
+    public ArrayList<User> getAll() {
+        return users;
+    }
+
+    @Override
     public User create(User entity) {
         users.add(entity);
         return entity;
