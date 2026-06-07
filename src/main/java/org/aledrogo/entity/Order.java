@@ -1,27 +1,19 @@
 package org.aledrogo.entity;
 
+import java.util.ArrayList;
+
 public class Order extends Entity {
-    private int quantity;
-    private final Offer offer;
+    private final ArrayList<Offer> offers;
     private final Buyer buyer;
     private final PaymentMethod paymentMethod;
     private final OrderShippingDetails shippingDetails;
     private OrderStatus status = OrderStatus.PENDING;
 
-    public Order(int quantity, Offer offer, Buyer buyer, PaymentMethod paymentMethod, OrderShippingDetails shippingDetails) {
-        this.offer = offer;
-        this.quantity = quantity;
+    public Order(ArrayList<Offer> offers, Buyer buyer, PaymentMethod paymentMethod, OrderShippingDetails shippingDetails) {
+        this.offers = offers;
         this.buyer = buyer;
         this.paymentMethod = paymentMethod;
         this.shippingDetails = shippingDetails;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
     }
 
     public OrderStatus getStatus() {
@@ -32,8 +24,8 @@ public class Order extends Entity {
         this.status = status;
     }
 
-    public Offer getOffer() {
-        return offer;
+    public ArrayList<Offer> getOffers() {
+        return offers;
     }
 
     public Buyer getBuyer() {
