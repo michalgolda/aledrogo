@@ -1,6 +1,7 @@
 package org.aledrogo.service;
 
 import org.aledrogo.entity.*;
+import org.aledrogo.repository.OfferRepository;
 import org.aledrogo.repository.OrderRepository;
 import org.aledrogo.repository.OrderReviewRepository;
 
@@ -10,18 +11,42 @@ import java.util.ArrayList;
 public class OrderService {
     public final OrderRepository orderRepository;
     public final OrderReviewRepository orderReviewRepository;
+    public final OfferRepository offerRepository;
 
-    public OrderService(OrderRepository orderRepository, OrderReviewRepository orderReviewRepository) {
+    public OrderService(OrderRepository orderRepository, OrderReviewRepository orderReviewRepository, OfferRepository offerRepository) {
         this.orderRepository = orderRepository;
         this.orderReviewRepository = orderReviewRepository;
+        this.offerRepository = offerRepository;
     }
 
-    public Order createOrder(ArrayList<Offer> offers, Buyer buyer, OrderShippingDetails orderShippingDetails, PaymentMethod paymentMethod) {
-        return null;
+    public Order createOrder(ArrayList<Offer> offers, Buyer buyer, OrderShippingDetails orderShippingDetails, PaymentMethod paymentMethod) throws Exception {
+        for (Offer offer : offers) {
+            Offer existingOffer = this.offerRepository.getById(offer.getId());
+            if (existingOffer != null) {
+                if (existingOffer.getQuantity() == 0) {
+                    throw new Exception("Oferta jest niedostępna");
+                }
+            }
+        }
+
+        Order newOrder = new Order(
+                offers,
+                buyer,
+                paymentMethod,
+                orderShippingDetails
+        );
+        this.orderRepository.create(newOrder);
+
+        return newOrder;
     }
 
-    public void deleteOrderReview(int orderReviewId) {
+    public void deleteOrderReview(int orderReviewId) throws Exception {
+        OrderReview orderReview = this.orderReviewRepository.getById(orderReviewId);
+        if (orderReview == null) {
+            throw new Exception("Nie znaleziono opinii");
+        }
 
+        this.orderReviewRepository.delete(orderReview);
     }
 
     public OrderReview updateOrderReview(int orderReviewId, float rating, String description) {
