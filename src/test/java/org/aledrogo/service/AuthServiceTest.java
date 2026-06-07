@@ -1,7 +1,6 @@
 package org.aledrogo.service;
 
 import org.aledrogo.entity.Customer;
-import org.aledrogo.entity.SystemRole;
 import org.aledrogo.entity.User;
 import org.aledrogo.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
