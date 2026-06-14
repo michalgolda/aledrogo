@@ -125,4 +125,57 @@ class OrderServiceTest {
         assertEquals("Zamówienie musi być zrealizowane", ex.getMessage());
         verify(orderReviewRepository, never()).create(any());
     }
+
+    @Test
+    void createOrderReviewPersistsTheDescription() throws Exception {
+        Order order = mock(Order.class);
+        when(order.getStatus()).thenReturn(OrderStatus.COMPLETED);
+
+        OrderReview result = orderService.createOrderReview(order, mock(Buyer.class), 5.0f, "Świetny produkt");
+
+        assertEquals("Świetny produkt", result.getDescription());
+    }
+
+    @Test
+    void completeOrderSetsStatusAndPersists() throws Exception {
+        Order order = mock(Order.class);
+        when(orderRepository.getById(1)).thenReturn(order);
+
+        Order result = orderService.completeOrder(1);
+
+        assertSame(order, result);
+        verify(order).setStatus(OrderStatus.COMPLETED);
+        verify(orderRepository).update(order);
+    }
+
+    @Test
+    void completeOrderThrowsWhenOrderDoesNotExist() {
+        when(orderRepository.getById(99)).thenReturn(null);
+
+        Exception ex = assertThrows(Exception.class, () -> orderService.completeOrder(99));
+
+        assertEquals("Nie znaleziono zamówienia", ex.getMessage());
+        verify(orderRepository, never()).update(any());
+    }
+
+    @Test
+    void getOrdersForBuyerReturnsOnlyThatBuyersOrders() {
+        Buyer buyer = mock(Buyer.class);
+        Buyer otherBuyer = mock(Buyer.class);
+
+        Order mine = mock(Order.class);
+        when(mine.getBuyer()).thenReturn(buyer);
+        Order theirs = mock(Order.class);
+        when(theirs.getBuyer()).thenReturn(otherBuyer);
+
+        ArrayList<Order> all = new ArrayList<>();
+        all.add(mine);
+        all.add(theirs);
+        when(orderRepository.getAll()).thenReturn(all);
+
+        ArrayList<Order> result = orderService.getOrdersForBuyer(buyer);
+
+        assertEquals(1, result.size());
+        assertSame(mine, result.get(0));
+    }
 }

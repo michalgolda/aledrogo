@@ -40,6 +40,27 @@ public class OrderService {
         return newOrder;
     }
 
+    public ArrayList<Order> getOrdersForBuyer(Buyer buyer) {
+        ArrayList<Order> result = new ArrayList<>();
+        for (Order order : this.orderRepository.getAll()) {
+            if (order.getBuyer() == buyer) {
+                result.add(order);
+            }
+        }
+        return result;
+    }
+
+    public Order completeOrder(int orderId) throws Exception {
+        Order order = this.orderRepository.getById(orderId);
+        if (order == null) {
+            throw new Exception("Nie znaleziono zamówienia");
+        }
+
+        order.setStatus(OrderStatus.COMPLETED);
+        this.orderRepository.update(order);
+        return order;
+    }
+
     public void deleteOrderReview(int orderReviewId) throws Exception {
         OrderReview orderReview = this.orderReviewRepository.getById(orderReviewId);
         if (orderReview == null) {
@@ -59,6 +80,7 @@ public class OrderService {
         }
 
         OrderReview orderReview = new OrderReview(order, reviewer, rating);
+        orderReview.setDescription(description);
         this.orderReviewRepository.create(orderReview);
         return orderReview;
     }

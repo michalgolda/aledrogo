@@ -33,11 +33,12 @@ public class MemoryOfferRepository extends OfferRepository {
     public Offer update(Offer entity) {
         ArrayList<Offer> offersForReplace = new ArrayList<>();
         for (Offer offer : offers) {
-            if (offer.getId() != entity.getId()) {
+            if (offer.getId().equals(entity.getId())) {
                 offersForReplace.add(entity);
+            } else {
+                offersForReplace.add(offer);
             }
         }
-        offersForReplace.add(entity);
         offers = offersForReplace;
         return entity;
     }
@@ -46,8 +47,8 @@ public class MemoryOfferRepository extends OfferRepository {
     public void delete(Offer entity) {
         ArrayList<Offer> offersForReplace = new ArrayList<>();
         for (Offer offer : offers) {
-            if (offer.getId() != entity.getId()) {
-                offersForReplace.add(entity);
+            if (!offer.getId().equals(entity.getId())) {
+                offersForReplace.add(offer);
             }
         }
         offers = offersForReplace;

@@ -33,11 +33,13 @@ public class MemoryOrderRepository extends OrderRepository {
     public Order update(Order entity) {
         ArrayList<Order> ordersForReplace = new ArrayList<>();
         for (Order order : orders) {
-            if (order.getId() != entity.getId()) {
+            if (order.getId().equals(entity.getId())) {
                 ordersForReplace.add(entity);
+            } else {
+                ordersForReplace.add(order);
             }
         }
-        ordersForReplace.add(entity);
+        orders = ordersForReplace;
         return entity;
     }
 
@@ -45,8 +47,8 @@ public class MemoryOrderRepository extends OrderRepository {
     public void delete(Order entity) {
         ArrayList<Order> ordersForReplace = new ArrayList<>();
         for (Order order : orders) {
-            if (order.getId() != entity.getId()) {
-                ordersForReplace.add(entity);
+            if (!order.getId().equals(entity.getId())) {
+                ordersForReplace.add(order);
             }
         }
         orders = ordersForReplace;

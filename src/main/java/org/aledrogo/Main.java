@@ -12,11 +12,12 @@ public class Main {
     public final OfferRepository offerRepository = new MemoryOfferRepository();
     public final OfferReportRepository offerReportRepository = new MemoryOfferReportRepository();
     public final OrderReviewRepository orderReviewRepository = new MemoryOrderReviewRepository();
+    public final OrderRepository orderRepository = new MemoryOrderRepository();
 
     public final AuthService authService = new AuthService(userRepository);
     public final OfferSearchService offerSearchService = new DummyOfferOfferSearchService(offerRepository);
     public final OfferService offerService = new OfferService(offerRepository, offerReportRepository);
-    public final OrderService orderService = new OrderService(new MemoryOrderRepository(), orderReviewRepository, offerRepository);
+    public final OrderService orderService = new OrderService(orderRepository, orderReviewRepository, offerRepository);
     public final CartService cartService = new CartService();
 
     private final Scanner scanner = new Scanner(System.in);
@@ -132,7 +133,9 @@ public class Main {
         System.out.println("4. Wyświetl koszyk");
         System.out.println("5. Wyczyść koszyk");
         System.out.println("6. Złóż zamówienie");
-        System.out.println("7. Dodaj opinię");
+        System.out.println("7. Wyświetl moje zamówienia");
+        System.out.println("8. Potwierdź odbiór zamówienia");
+        System.out.println("9. Dodaj opinię");
         System.out.println("0. Wyloguj się");
         System.out.print("> ");
 
@@ -143,7 +146,9 @@ public class Main {
             case "4" -> viewCart();
             case "5" -> clearCart();
             case "6" -> placeOrder();
-            case "7" -> createOrderReview();
+            case "7" -> viewMyOrders();
+            case "8" -> completeOrder();
+            case "9" -> createOrderReview();
             case "0" -> logout();
             default  -> System.out.println("Nieznana opcja.");
         }
@@ -213,10 +218,10 @@ public class Main {
         String name = scanner.nextLine().trim();
         System.out.print("Opis: ");
         String description = scanner.nextLine().trim();
-        System.out.print("Cena: ");
-        double price = Double.parseDouble(scanner.nextLine().trim());
-        System.out.print("Ilość: ");
-        int quantity = Integer.parseInt(scanner.nextLine().trim());
+        Double price = askDouble("Cena: ");
+        if (price == null) return;
+        Integer quantity = askInt("Ilość: ");
+        if (quantity == null) return;
 
         Offer offer = new Offer(name, description, price, quantity, (Seller) loggedInUser);
         Offer created = offerService.createOffer(offer);
@@ -224,8 +229,8 @@ public class Main {
     }
 
     private void updateOffer() {
-        System.out.print("ID oferty: ");
-        int id = Integer.parseInt(scanner.nextLine().trim());
+        Integer id = askInt("ID oferty: ");
+        if (id == null) return;
         Offer offer = offerRepository.getById(id);
         if (offer == null) { System.out.println("Nie znaleziono oferty."); return; }
 
@@ -238,10 +243,20 @@ public class Main {
         System.out.print("Nowa ilość [" + offer.getQuantity() + "]: ");
         String quantityInput = scanner.nextLine().trim();
 
-        if (!name.isEmpty())          offer.setName(name);
-        if (!description.isEmpty())   offer.setDescription(description);
-        if (!priceInput.isEmpty())    offer.setPrice(Double.parseDouble(priceInput));
-        if (!quantityInput.isEmpty()) offer.setQuantity(Integer.parseInt(quantityInput));
+        Double price = null;
+        Integer quantity = null;
+        try {
+            if (!priceInput.isEmpty())    price = Double.parseDouble(priceInput);
+            if (!quantityInput.isEmpty()) quantity = Integer.parseInt(quantityInput);
+        } catch (NumberFormatException e) {
+            System.out.println("Niepoprawna cena lub ilość. Zmiany nie zostały zapisane.");
+            return;
+        }
+
+        if (!name.isEmpty())        offer.setName(name);
+        if (!description.isEmpty()) offer.setDescription(description);
+        if (price != null)          offer.setPrice(price);
+        if (quantity != null)       offer.setQuantity(quantity);
 
         Offer updated = offerService.updateOffer(offer);
         System.out.println("Oferta zaktualizowana.");
@@ -249,8 +264,8 @@ public class Main {
     }
 
     private void deleteOffer() {
-        System.out.print("ID oferty: ");
-        int id = Integer.parseInt(scanner.nextLine().trim());
+        Integer id = askInt("ID oferty: ");
+        if (id == null) return;
         try {
             offerService.deleteOffer(id);
             System.out.println("Oferta usunięta.");
@@ -260,8 +275,8 @@ public class Main {
     }
 
     private void reportOffer() {
-        System.out.print("ID oferty: ");
-        int id = Integer.parseInt(scanner.nextLine().trim());
+        Integer id = askInt("ID oferty: ");
+        if (id == null) return;
         Offer offer = offerRepository.getById(id);
         if (offer == null) { System.out.println("Nie znaleziono oferty."); return; }
 
@@ -273,8 +288,8 @@ public class Main {
     }
 
     private void addToCart() {
-        System.out.print("ID oferty: ");
-        int id = Integer.parseInt(scanner.nextLine().trim());
+        Integer id = askInt("ID oferty: ");
+        if (id == null) return;
         Offer offer = offerRepository.getById(id);
         if (offer == null) { System.out.println("Nie znaleziono oferty."); return; }
 
@@ -290,8 +305,12 @@ public class Main {
         for (int i = 0; i < items.size(); i++) {
             System.out.println("  [" + i + "] " + items.get(i).getName());
         }
-        System.out.print("Indeks do usunięcia: ");
-        int index = Integer.parseInt(scanner.nextLine().trim());
+        Integer index = askInt("Indeks do usunięcia: ");
+        if (index == null) return;
+        if (index < 0 || index >= items.size()) {
+            System.out.println("Niepoprawny indeks.");
+            return;
+        }
         cartService.removeItem(index);
         System.out.println("Produkt usunięty z koszyka.");
     }
@@ -328,7 +347,13 @@ public class Main {
         System.out.print("Województwo: ");
         String voivodeship = scanner.nextLine().trim();
         System.out.print("Metoda płatności (CARD/TRANSFER/CASH): ");
-        PaymentMethod paymentMethod = PaymentMethod.valueOf(scanner.nextLine().trim().toUpperCase());
+        PaymentMethod paymentMethod;
+        try {
+            paymentMethod = PaymentMethod.valueOf(scanner.nextLine().trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            System.out.println("Niepoprawna metoda płatności.");
+            return;
+        }
 
         OrderShippingDetails shippingDetails = new OrderShippingDetails(country, address, city, postalCode, phoneNumber, voivodeship);
 
@@ -342,8 +367,8 @@ public class Main {
     }
 
     private void deleteOrderReview() {
-        System.out.print("ID opinii: ");
-        int id = Integer.parseInt(scanner.nextLine().trim());
+        Integer id = askInt("ID opinii: ");
+        if (id == null) return;
         try {
             orderService.deleteOrderReview(id);
             System.out.println("Opinia usunięta.");
@@ -352,14 +377,38 @@ public class Main {
         }
     }
 
+    private void viewMyOrders() {
+        ArrayList<Order> orders = orderService.getOrdersForBuyer((Customer) loggedInUser);
+        if (orders.isEmpty()) {
+            System.out.println("Nie masz żadnych zamówień.");
+            return;
+        }
+        System.out.println("Twoje zamówienia (" + orders.size() + "):");
+        for (Order order : orders) {
+            System.out.println("  [" + order.getId() + "] status: " + order.getStatus()
+                    + " | produktów: " + order.getOffers().size());
+        }
+    }
+
+    private void completeOrder() {
+        Integer id = askInt("ID zamówienia: ");
+        if (id == null) return;
+        try {
+            orderService.completeOrder(id);
+            System.out.println("Potwierdzono odbiór zamówienia. Możesz teraz dodać opinię.");
+        } catch (Exception e) {
+            System.out.println("Błąd: " + e.getMessage());
+        }
+    }
+
     private void createOrderReview() {
-        System.out.print("ID zamówienia: ");
-        int orderId = Integer.parseInt(scanner.nextLine().trim());
-        Order order = new MemoryOrderRepository().getById(orderId);
+        Integer orderId = askInt("ID zamówienia: ");
+        if (orderId == null) return;
+        Order order = orderRepository.getById(orderId);
         if (order == null) { System.out.println("Nie znaleziono zamówienia."); return; }
 
-        System.out.print("Ocena (1-5): ");
-        float rating = Float.parseFloat(scanner.nextLine().trim());
+        Float rating = askFloat("Ocena (1-5): ");
+        if (rating == null) return;
         System.out.print("Opis: ");
         String description = scanner.nextLine().trim();
 
@@ -368,6 +417,39 @@ public class Main {
             System.out.println("Opinia dodana (ID: " + review.getId() + ").");
         } catch (Exception e) {
             System.out.println("Błąd: " + e.getMessage());
+        }
+    }
+
+    private Integer askInt(String prompt) {
+        System.out.print(prompt);
+        String raw = scanner.nextLine().trim();
+        try {
+            return Integer.parseInt(raw);
+        } catch (NumberFormatException e) {
+            System.out.println("Niepoprawna liczba całkowita.");
+            return null;
+        }
+    }
+
+    private Double askDouble(String prompt) {
+        System.out.print(prompt);
+        String raw = scanner.nextLine().trim();
+        try {
+            return Double.parseDouble(raw);
+        } catch (NumberFormatException e) {
+            System.out.println("Niepoprawna liczba.");
+            return null;
+        }
+    }
+
+    private Float askFloat(String prompt) {
+        System.out.print(prompt);
+        String raw = scanner.nextLine().trim();
+        try {
+            return Float.parseFloat(raw);
+        } catch (NumberFormatException e) {
+            System.out.println("Niepoprawna liczba.");
+            return null;
         }
     }
 

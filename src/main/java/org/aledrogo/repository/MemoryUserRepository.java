@@ -44,11 +44,12 @@ public class MemoryUserRepository extends UserRepository {
     public User update(User entity) {
         ArrayList<User> usersForReplace = new ArrayList<>();
         for (User user : users) {
-            if (user.getId() == entity.getId()) {
+            if (user.getId().equals(entity.getId())) {
                 usersForReplace.add(entity);
+            } else {
+                usersForReplace.add(user);
             }
         }
-        usersForReplace.add(entity);
         users = usersForReplace;
         return entity;
     }
@@ -57,8 +58,8 @@ public class MemoryUserRepository extends UserRepository {
     public void delete(User entity) {
         ArrayList<User> usersForReplace = new ArrayList<>();
         for (User user : users) {
-            if (user.getId() == entity.getId()) {
-                usersForReplace.add(entity);
+            if (!user.getId().equals(entity.getId())) {
+                usersForReplace.add(user);
             }
         }
         users = usersForReplace;
