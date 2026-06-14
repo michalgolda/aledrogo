@@ -32,11 +32,13 @@ public class MemoryOrderReviewRepository extends OrderReviewRepository {
     public OrderReview update(OrderReview entity) {
         ArrayList<OrderReview> reviewsForReplace = new ArrayList<>();
         for (OrderReview review : reviews) {
-            if (review.getId() != entity.getId()) {
+            if (review.getId().equals(entity.getId())) {
                 reviewsForReplace.add(entity);
+            } else {
+                reviewsForReplace.add(review);
             }
         }
-        reviewsForReplace.add(entity);
+        reviews = reviewsForReplace;
         return entity;
     }
 
@@ -44,8 +46,8 @@ public class MemoryOrderReviewRepository extends OrderReviewRepository {
     public void delete(OrderReview entity) {
         ArrayList<OrderReview> reviewsForReplace = new ArrayList<>();
         for (OrderReview review : reviews) {
-            if (review.getId() != entity.getId()) {
-                reviewsForReplace.add(entity);
+            if (!review.getId().equals(entity.getId())) {
+                reviewsForReplace.add(review);
             }
         }
         reviews = reviewsForReplace;
